@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeverIDDictAPI", "SeverIDDictAPI\SeverIDDictAPI.csproj", "{A364E880-6845-447F-BF6F-4E4A56B4CCCB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A364E880-6845-447F-BF6F-4E4A56B4CCCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A364E880-6845-447F-BF6F-4E4A56B4CCCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A364E880-6845-447F-BF6F-4E4A56B4CCCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A364E880-6845-447F-BF6F-4E4A56B4CCCB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BCBBA980-3BBA-4B6C-8A97-8AB34FB62909}
+	EndGlobalSection
+EndGlobal

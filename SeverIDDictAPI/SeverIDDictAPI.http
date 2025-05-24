@@ -1,0 +1,6 @@
+@SeverIDDictAPI_HostAddress = http://localhost:5016
+
+GET {{SeverIDDictAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
