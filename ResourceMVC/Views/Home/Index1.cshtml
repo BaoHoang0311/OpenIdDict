@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Index1";
+}
+<h2>Privacy</h2>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <p>Xin chào @User.FindFirst("Email")?.Value</p>
+    <p>@ViewBag.Token</p>
+}
+else
+{
+    <p>Bạn chưa đăng nhập</p>
+}

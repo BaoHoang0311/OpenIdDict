@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Bao debug(console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/SeverIDDictAPI/bin/Debug/net9.0/SeverIDDictAPI.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}//SeverIDDictAPI",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+        },
+    ]
+}

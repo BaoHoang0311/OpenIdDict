@@ -1,4 +1,4 @@
-@SeverIDDictAPI_HostAddress = http://localhost:5016
+@SeverIDDictAPI_HostAddress = http://localhost:7293
 
 GET {{SeverIDDictAPI_HostAddress}}/weatherforecast/
 Accept: application/json
