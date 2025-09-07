@@ -36,8 +36,11 @@ namespace ResourceMVC.Controllers
         {
             var token = HttpContext.Session.GetString("Token");
             ViewBag.Token = token; // đưa sang View
-            //F:\OpenIdDict\ResourceMVC\Views\Home\Index1.cshtml
             return View("~/Views/Home/Index1.cshtml");
+        }
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
         public async Task<IActionResult> Privacy(string code)
         {
@@ -72,12 +75,6 @@ namespace ResourceMVC.Controllers
             HttpContext.Session.SetString("Token", responseContent);
             // redirect sang Privacy để user thấy kết quả
             return RedirectToAction("Index1");
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
         public IActionResult LoginwithServer()
         {

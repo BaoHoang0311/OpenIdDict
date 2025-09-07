@@ -12,7 +12,6 @@
             builder.Services.AddSession();
             builder.Services.AddAuthentication(o =>
             {
-                o.DefaultSignInScheme = "Application"; // thêm dòng này
                 o.DefaultAuthenticateScheme = "Application";
                 o.DefaultScheme = "Application";
             })
@@ -20,7 +19,7 @@
             {
                 options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(2);
-                options.LoginPath = "/Home/Index";
+                options.LoginPath = "/Home/Index"; // Yêu cầu đăng nhập
                 options.AccessDeniedPath = "/Home/AccessDenied";
                 options.SlidingExpiration = true;
             });

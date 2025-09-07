@@ -48,12 +48,7 @@ namespace SeverIDDictAPI
             // dotnet ef database update là xong có db của Identity
             builder.Services.AddOpenApi();
 
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-                 .AddEntityFrameworkStores<ApplicationDbContext>()
-                 .AddDefaultTokenProviders();
-
-            builder.Services.AddControllersWithViews();
-            builder.Services.Configure<IdentityOptions>(options =>
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
                 // Thiết lập về Password
                 options.Password.RequireDigit = false; // Không bắt phải có số
@@ -74,7 +69,13 @@ namespace SeverIDDictAPI
                 options.SignIn.RequireConfirmedEmail = true;            // Cấu hình xác thực địa chỉ email (email phải tồn tại)
                                                                         // options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
                                                                         // options.SignIn.RequireConfirmedPhoneNumber = false;     // Xác thực số điện thoại
-            });
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+            builder.Services.AddControllersWithViews();
+
+
 
 
             var rsaKeyService1 = new RsaKeyService1();
@@ -115,14 +116,13 @@ namespace SeverIDDictAPI
                 .EnableAuthorizationEndpointPassthrough();
             });
 
-            // Cấu hình xác thực với đường dẫn đăng nhập tùy chỉnh
+            builder.Services.AddHostedService<Worker>();
+
+            // Dùng Microsoft.AspNetCore.Identity.EntityFrameworkCore nên ko custom được cookie ".Application" ... phải dùng default
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = "/Home/Login"; // Chuyển hướng đến /Home/Login khi chưa đăng nhập
-                options.AccessDeniedPath = "/Home/AccessDenied"; // Tùy chọn: Trang khi bị từ chối truy cập
             });
-
-            builder.Services.AddHostedService<Worker>();
 
             var app = builder.Build();
 
