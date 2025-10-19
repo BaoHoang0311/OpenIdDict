@@ -39,7 +39,7 @@ namespace SeverIDDictAPI
                             // Nếu dùng OpenID Connect
                         OpenIddictConstants.Permissions.ResponseTypes.Code, // nên url truy cập phải có response_type=code
 
-                        // phải khai như vậy thì khi app.zzz nó sẽ báo lỗi 
+                        // phải khai như vậy thì khi scope có app.zzz nó sẽ báo lỗi 
                         //   var scope = Uri.EscapeDataString("email offline_access profile api.write api.zzz");
                         //      return Redirect($"https://localhost:7293/connect/authorize?client_id=test_client&response_type=code&scope={scope}");
                         OpenIddictConstants.Permissions.Scopes.Email,
@@ -117,11 +117,10 @@ namespace SeverIDDictAPI
             // Seed các scopes cơ bản
             var scopes = new[]
             {
-                //new { Name = "openid", DisplayName = "OpenID", Description = "OpenID Connect scope", Resourses ="" },
                 new { Name = "profile", DisplayName = "Profile", Description = "Access to user profile" ,  Resources = Array.Empty<string>()},
                 new { Name = "email", DisplayName = "Email", Description = "Access to user email" ,  Resources = Array.Empty<string>() },
-                new { Name = "api.read", DisplayName = "API Read", Description = "Read access to API resources",  Resources = new string[] { "API_hihi" ,"Resouces"} },
-                new { Name = "api.write", DisplayName = "API Write", Description = "Write access to API resources 1",  Resources = new string[] { "API_hihi" ,"Resouces"}},
+                new { Name = "api.read", DisplayName = "API Read", Description = "Read access to API resources",  Resources = new string[] { "API_read" ,"Resouces"} },
+                new { Name = "api.write", DisplayName = "API Write", Description = "Write access to API resources 1",  Resources = new string[] { "API_write" ,"Resouces"}},
                 new { Name = "user.management", DisplayName = "User Management", Description = "Manage users",  Resources = Array.Empty<string>() },
                 new { Name = "offline_access", DisplayName = "offline_access", Description = "offline_access" , Resources =Array.Empty<string>() }
             };

@@ -101,44 +101,43 @@ namespace ResourceAPI
                 options.Audience = "Resource";
                 // name of the API resource
                 options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
+                options.SaveToken = true; //var token = await HttpContext.GetTokenAsync("access_token");
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateLifetime = true,  // Phải bật lên
                     ClockSkew = TimeSpan.Zero // Loại bỏ khoảng trễ mặc định
                 };
-                options.Events = new JwtBearerEvents
-                {
-                    OnTokenValidated = async context =>
-                    {
-                        var tokenService = context.HttpContext.RequestServices
-                                        .GetRequiredService<TokenIntrospectionService>();
-
-                        var tokenString = "";
-                        // Hoặc lấy từ Authorization header
-                        var authHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                        if (authHeader != null && authHeader.StartsWith("Bearer "))
-                        {
-                            tokenString = authHeader.Substring("Bearer ".Length).Trim();
-                        }
-                        var isActive = await tokenService.IsTokenActiveAsync(tokenString);
-
-                        if (!isActive)
-                        {
-                            context.Fail("Token has been revoked");
-                        }
-
-
-                        var roleClaim = context.Principal.FindFirst(ClaimTypes.Role);
-                        if (roleClaim == null)
-                        {
-                            // Không có claim "role", từ chối xác thực
-                            context.Fail("Missing required 'role' claim.");
-                        }
-
-                        //return Task.CompletedTask;
-                    }
-                };
+                ///
+                /// trong thực tế ko cần check gì cả logout thì đem thằng refresh token thu hồi là xong chấp nhận thằng accesstoken có quyền truy cập trong
+                /// khoảng thời gian ngắn
+                ///
+                //options.Events = new JwtBearerEvents
+                //{
+                //    OnTokenValidated = async context =>
+                //    {
+                //        var tokenService = context.HttpContext.RequestServices
+                //                        .GetRequiredService<TokenIntrospectionService>();
+                //        var tokenString = "";
+                //        // Hoặc lấy từ Authorization header
+                //        var authHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+                //        if (authHeader != null && authHeader.StartsWith("Bearer "))
+                //        {
+                //            tokenString = authHeader.Substring("Bearer ".Length).Trim();
+                //        }
+                //        var isActive = await tokenService.IsTokenActiveAsync(tokenString);
+                //        if (!isActive)
+                //        {
+                //            context.Fail("Token has been revoked");
+                //        }
+                //        var roleClaim = context.Principal.FindFirst(ClaimTypes.Role);
+                //        if (roleClaim == null)
+                //        {
+                //            // Không có claim "role", từ chối xác thực
+                //            context.Fail("Missing required 'role' claim.");
+                //        }
+                //        //return Task.CompletedTask;
+                //    }
+                //};
             });
 
             builder.Services.AddAuthorization(options =>

@@ -158,6 +158,7 @@ namespace SeverIDDictAPI.Controllers
                     var scopes = principal.GetScopes(); // lấy trong request
 
                     var listScopeDb = new List<OpenIddictScopeDescriptor>();
+
                     // check scope 
                     // lấy những scope Có Resourse = "API_hihi" .Resourses = Hashset<string>
 
@@ -167,7 +168,7 @@ namespace SeverIDDictAPI.Controllers
                     {
                         var resources = await _scopeManager.GetResourcesAsync(scope);
 
-                        if (resources.Contains("API_hihi"))
+                        if (resources.Contains("API_read"))
                         {
                             var name = await _scopeManager.GetNameAsync(scope);
                             scopeNames.Add(name);
@@ -189,7 +190,7 @@ namespace SeverIDDictAPI.Controllers
                     Identity.AddClaim(new Claim("userid", authenticateResult.Principal.Claims.FirstOrDefault(x => x.Type == "userid").Value));
                     Identity.AddClaim(new Claim(Claims.Role, "Admin"));
 
-                    // Thêm audience claims dựa trên scopes
+                    // Thêm audience claims (trong jwt token) dựa trên scopes
                     if (scopes.Contains("api.read") || scopes.Contains("api.write"))
                     {
                         Identity.SetResources(new[] { "Resource", "Api-Resource" });
@@ -245,6 +246,7 @@ namespace SeverIDDictAPI.Controllers
                 });
             }
         }
+        
         /*
          * 1 MVC Controller ( LoginWithServer) trong đó có query param 
          * 2 vào thằng (connect/authorize)  
@@ -259,7 +261,6 @@ namespace SeverIDDictAPI.Controllers
          * 3.2 nếu đăng nhập rồi thì lấy thông tin param đem vào "OpenIddict.Server.AspNetCore"
          *              ->Redirect vào returnURL đã setting trong Worker.cs (RedirectUris = { new Uri("https://localhost:7224/Home/Privacy") }, //(ResourceMVC)
          */
-
         [HttpGet("connect/authorize")]
         public async Task<IActionResult> Authorize()
         {

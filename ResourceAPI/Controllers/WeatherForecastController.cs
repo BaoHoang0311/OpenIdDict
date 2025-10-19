@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Protocols;
@@ -33,8 +34,10 @@ namespace ResourceAPI.Controllers
 
         [Authorize(Roles = "Admin,Customer")]
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<IEnumerable<WeatherForecast>> Get()
         {
+            // x.SaveToken = true;
+            var token = await HttpContext.GetTokenAsync("access_token");
             var user = User.Identity; // Tìm claim với thông tin từ cái này
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
