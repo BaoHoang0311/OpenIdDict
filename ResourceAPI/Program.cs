@@ -96,7 +96,6 @@ namespace ResourceAPI
             })
             .AddJwtBearer(options =>
             {
-                var SettingJs = builder.Configuration.GetSection("AuthServer");
                 options.Authority = "https://localhost:7293/"; // nó tự lấy key /.wellknow/jwks ko cần custom như bên dưới                          
                 options.Audience = "Resource";
                 // name of the API resource
