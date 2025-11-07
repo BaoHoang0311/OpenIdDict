@@ -189,6 +189,7 @@ namespace SeverIDDictAPI.Controllers
                     Identity.AddClaim(new Claim(Claims.Subject, authenticateResult.Principal.Claims.FirstOrDefault(x => x.Type == "userid").Value));
                     Identity.AddClaim(new Claim("userid", authenticateResult.Principal.Claims.FirstOrDefault(x => x.Type == "userid").Value));
                     Identity.AddClaim(new Claim(Claims.Role, "Admin"));
+                    Identity.AddClaim(new Claim(Claims.Birthdate, "1995"));
 
                     // Thêm audience claims (trong jwt token) dựa trên scopes
                     if (scopes.Contains("api.read") || scopes.Contains("api.write"))
