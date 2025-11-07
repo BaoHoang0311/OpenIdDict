@@ -100,7 +100,7 @@ namespace SeverIDDictAPI
             var rsaKeyService1 = new RsaKeyService1();
             builder.Services.AddSingleton(rsaKeyService1);
 
-            //Cionfigure OpenIddict 
+            //Configure OpenIddict 
             // sau chạy dotnet ef migrations add OpenIDDict là có 4 bảng tbo
             builder.Services.AddOpenIddict()
                            .AddCore(coreOptions =>
@@ -119,7 +119,7 @@ namespace SeverIDDictAPI
                 options.AllowPasswordFlow().AllowRefreshTokenFlow();
                 options.AllowAuthorizationCodeFlow();
 
-                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(20));
+                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(1));
 
                 // Encryption and signing of tokens
                 options
