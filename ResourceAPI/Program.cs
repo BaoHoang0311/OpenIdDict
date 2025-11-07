@@ -96,7 +96,6 @@ namespace ResourceAPI
             })
             .AddJwtBearer(options =>
             {
-                var SettingJs = builder.Configuration.GetSection("AuthServer");
                 options.Authority = "https://localhost:7293/"; // nó tự lấy key /.wellknow/jwks ko cần custom như bên dưới                          
                 options.Audience = "Resource";
                 // name of the API resource
@@ -107,38 +106,38 @@ namespace ResourceAPI
                     ValidateLifetime = true,  // Phải bật lên
                     ClockSkew = TimeSpan.Zero // Loại bỏ khoảng trễ mặc định
                 };
-                options.Events = new JwtBearerEvents
-                {
-                    OnTokenValidated = async context =>
-                    {
-                        var tokenService = context.HttpContext.RequestServices
-                                        .GetRequiredService<TokenIntrospectionService>();
+                //options.Events = new JwtBearerEvents
+                //{
+                //    OnTokenValidated = async context =>
+                //    {
+                //        var tokenService = context.HttpContext.RequestServices
+                //                        .GetRequiredService<TokenIntrospectionService>();
 
-                        var tokenString = "";
-                        // Hoặc lấy từ Authorization header
-                        var authHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                        if (authHeader != null && authHeader.StartsWith("Bearer "))
-                        {
-                            tokenString = authHeader.Substring("Bearer ".Length).Trim();
-                        }
-                        var isActive = await tokenService.IsTokenActiveAsync(tokenString);
+                //        var tokenString = "";
+                //        // Hoặc lấy từ Authorization header
+                //        var authHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+                //        if (authHeader != null && authHeader.StartsWith("Bearer "))
+                //        {
+                //            tokenString = authHeader.Substring("Bearer ".Length).Trim();
+                //        }
+                //        var isActive = await tokenService.IsTokenActiveAsync(tokenString);
 
-                        if (!isActive)
-                        {
-                            context.Fail("Token has been revoked");
-                        }
+                //        if (!isActive)
+                //        {
+                //            context.Fail("Token has been revoked");
+                //        }
 
 
-                        var roleClaim = context.Principal.FindFirst(ClaimTypes.Role);
-                        if (roleClaim == null)
-                        {
-                            // Không có claim "role", từ chối xác thực
-                            context.Fail("Missing required 'role' claim.");
-                        }
+                //        var roleClaim = context.Principal.FindFirst(ClaimTypes.Role);
+                //        if (roleClaim == null)
+                //        {
+                //            // Không có claim "role", từ chối xác thực
+                //            context.Fail("Missing required 'role' claim.");
+                //        }
 
-                        //return Task.CompletedTask;
-                    }
-                };
+                //        //return Task.CompletedTask;
+                //    }
+                //};
             });
 
             builder.Services.AddAuthorization(options =>

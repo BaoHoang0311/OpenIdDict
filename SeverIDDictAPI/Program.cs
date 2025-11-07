@@ -14,17 +14,36 @@ namespace SeverIDDictAPI
 
         public RsaKeyService1()
         {
-            using var rsa = RSA.Create(2048);
+            // 1️⃣ Load hoặc tạo Signing key (persisted to file)
+            var signingKeyPath = Path.Combine(AppContext.BaseDirectory, "signing-key.xml");
+            SigningKey = LoadOrCreateRsaKey(signingKeyPath, "signing-key-2025");
 
-            SigningKey = new RsaSecurityKey(rsa.ExportParameters(true))
+            // 2️⃣ Load hoặc tạo Encryption key (persisted to file)
+            var encryptionKeyPath = Path.Combine(AppContext.BaseDirectory, "encryption-key.xml");
+            EncryptionKey = LoadOrCreateRsaKey(encryptionKeyPath, "encryption-key-2025");
+        }
+
+        private static RsaSecurityKey LoadOrCreateRsaKey(string filePath, string keyId)
+        {
+            RSA rsa = RSA.Create(2048);
+
+            if (File.Exists(filePath))
             {
-                KeyId = Guid.NewGuid().ToString()
+                var xml = File.ReadAllText(filePath);
+                rsa.FromXmlString(xml);
+            }
+            else
+            {
+                var xml = rsa.ToXmlString(includePrivateParameters: true);
+                File.WriteAllText(filePath, xml);
+            }
+
+            var key = new RsaSecurityKey(rsa)
+            {
+                KeyId = keyId  // 🔥 Gán KeyId rõ ràng, cố định ,sẽ ko bị đổi khi app restart
             };
 
-            EncryptionKey = new RsaSecurityKey(rsa.ExportParameters(true))
-            {
-                KeyId = Guid.NewGuid().ToString()
-            };
+            return key;
         }
     }
     public class Program
