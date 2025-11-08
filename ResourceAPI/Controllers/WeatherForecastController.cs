@@ -25,13 +25,13 @@ namespace ResourceAPI.Controllers
         public class UpdateUser
         {
             public string Status { get; set; }
+            public DateOnly Date { get; set; }
         }
         [HttpPost("{id}/slogan")]
-        public async Task<IActionResult> GetID([FromRoute] int id, [FromBody]UpdateUser model)
+        public async Task<IActionResult> GetID([FromRoute] int id, [FromQuery] DateOnly date, [FromBody]UpdateUser model)
         {
-            return Ok(new { Id = id, Data = model });
+            return Ok(new { FromRoute = id, FromBody = model, FromQuery = date });
         }
-
         [Authorize(Roles = "Admin,Customer")]
         [HttpGet(Name = "GetWeatherForecast")]
         public async Task<IEnumerable<WeatherForecast>> Get()
@@ -82,7 +82,7 @@ namespace ResourceAPI.Controllers
             .ToArray();
         }
         #region Verify Token
-        public async Task<ClaimsPrincipal> GetPrincipalFromExpiredToken(string accessToken)
+        private async Task<ClaimsPrincipal> GetPrincipalFromExpiredToken(string accessToken)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace ResourceAPI.Controllers
             return Ok(true);
         }
         // 5. Custom Attribute để kiểm tra Required Scope
-        public class RequiredScopeAttribute : Attribute, IAuthorizationFilter
+        private class RequiredScopeAttribute : Attribute, IAuthorizationFilter
         {
             private readonly string _requiredScope;
 
