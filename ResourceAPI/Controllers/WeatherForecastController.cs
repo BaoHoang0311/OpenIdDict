@@ -68,6 +68,7 @@ namespace ResourceAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [Authorize(Policy = "InGenZ")]
         [HttpGet("CheckPolicy")]
         public IEnumerable<WeatherForecast> CheckPolicy()

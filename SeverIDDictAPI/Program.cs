@@ -119,7 +119,7 @@ namespace SeverIDDictAPI
                 options.AllowPasswordFlow().AllowRefreshTokenFlow();
                 options.AllowAuthorizationCodeFlow();
 
-                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(1));
+                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(60));
 
                 // Encryption and signing of tokens
                 options

@@ -27,14 +27,14 @@ public class GenZRequirementHandler : AuthorizationHandler<GenZrequirement>
         var user = context.User;
         if(user.Identity.IsAuthenticated  ==false) 
         {
-            context.Fail(new AuthorizationFailureReason(this, "User is not authenticated."));
+            context.Fail();
             return Task.CompletedTask; // 
         }
-        var birthdate =Convert.ToInt64(user.Claims.FirstOrDefault(x => x.Type == "birthdate").Value);
+        var birthdate =Convert.ToInt64(user.Claims.FirstOrDefault(x => x.Type == ClaimTypes.DateOfBirth).Value);
 
-        if (birthdate < requirement.MinYear && birthdate > requirement.MaxYear)
+        if (birthdate < requirement.MinYear || birthdate > requirement.MaxYear)
         {
-            context.Fail(new AuthorizationFailureReason(this, "User is not Gen Z."));
+            context.Fail();
             return Task.CompletedTask;
         }
 

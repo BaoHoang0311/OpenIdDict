@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Text.Json;
-using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 namespace ResourceAPI
 {
     public class TokenIntrospectionService
@@ -55,18 +56,21 @@ namespace ResourceAPI
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
             builder.Services.AddMemoryCache();
+
             builder.Services.AddSwaggerGen(options =>
             {
                 #region jwt authentication
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
+                    Name = "Authorization",
+                    Scheme = "bearer",
+                    BearerFormat="JWT",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http, // có sẵn bearer trong swagger
                     Description =
                         "JWT Authorization header using the Bearer scheme. \r\n\r\n " +
-                        "Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\n" +
+                        "<token> doesnt need bearer trước"+
                         "Example: \"12345abcdef\"",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Scheme = "Bearer"
                 });
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
@@ -138,6 +142,8 @@ namespace ResourceAPI
                 //    }
                 //};
             });
+            // Register the handler so the DI system will call it
+            builder.Services.AddSingleton<IAuthorizationHandler, GenZRequirementHandler>();
 
             builder.Services.AddAuthorization(options =>
             {

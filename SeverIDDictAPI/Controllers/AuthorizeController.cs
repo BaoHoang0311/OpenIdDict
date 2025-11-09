@@ -318,7 +318,7 @@ namespace SeverIDDictAPI.Controllers
 
             return claim.Type switch
             {
-                Claims.Role or "userid" or Claims.Email or Claims.Audience => new[] { Destinations.AccessToken }, // Chỉ thêm sub vào identity token
+                Claims.Role or "userid" or Claims.Email or Claims.Audience or Claims.Birthdate => new[] { Destinations.AccessToken }, // Chỉ thêm sub vào identity token
                 _ => Array.Empty<string>(),                           // Các claim khác không thêm vào token
             };
         }
