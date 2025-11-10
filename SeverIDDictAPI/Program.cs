@@ -46,6 +46,10 @@ namespace SeverIDDictAPI
             return key;
         }
     }
+
+    /// <summary>
+    ///     Core Identity + OpenIddict
+    /// </summary>
     public class Program
     {
         public static void Main(string[] args)
@@ -86,8 +90,8 @@ namespace SeverIDDictAPI
                 options.User.RequireUniqueEmail = true; // Email là duy nhất , UserName là duy nhất thì setting strong dbContext
                                                         // // Cấu hình đăng nhập.
                 options.SignIn.RequireConfirmedEmail = true;            // Cấu hình xác thực địa chỉ email (email phải tồn tại)
-                                                                        // options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
-                                                                        // options.SignIn.RequireConfirmedPhoneNumber = false;     // Xác thực số điện thoại
+                // options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                // options.SignIn.RequireConfirmedPhoneNumber = false;     // Xác thực số điện thoại
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
