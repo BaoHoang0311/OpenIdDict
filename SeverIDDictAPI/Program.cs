@@ -66,40 +66,8 @@ namespace SeverIDDictAPI
                 // Add Openiddict
                 option.UseOpenIddict();
             });
-            // tải nuget .net core identity bình thường
-            // xong chạy lênh dotnet ef migrations add Init
-            // dotnet ef database update là xong có db của Identity
             builder.Services.AddOpenApi();
-
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-            {
-                // Thiết lập về Password
-                options.Password.RequireDigit = false; // Không bắt phải có số
-                options.Password.RequireLowercase = false; // Không bắt phải có chữ thường
-                options.Password.RequireNonAlphanumeric = false; // Không bắt ký tự đặc biệt
-                options.Password.RequireUppercase = false; // Không bắt buộc chữ in
-                options.Password.RequiredLength = 0; // Số ký tự tối thiểu của password
-                options.Password.RequiredUniqueChars = 0; // Số ký tự riêng biệt
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@ -_.";
-                // // Cấu hình Lockout - khóa user
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1); // Khóa 1 phút
-                options.Lockout.MaxFailedAccessAttempts = 2; // Thất bại 2 lầ thì khóa
-                //options.Lockout.AllowedForNewUsers = true;
-
-                // // Cấu hình về User.
-                options.User.RequireUniqueEmail = true; // Email là duy nhất , UserName là duy nhất thì setting strong dbContext
-                                                        // // Cấu hình đăng nhập.
-                options.SignIn.RequireConfirmedEmail = true;            // Cấu hình xác thực địa chỉ email (email phải tồn tại)
-                // options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
-                // options.SignIn.RequireConfirmedPhoneNumber = false;     // Xác thực số điện thoại
-            })
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
-
             builder.Services.AddControllersWithViews();
-
-
-
 
             var rsaKeyService1 = new RsaKeyService1();
             builder.Services.AddSingleton(rsaKeyService1);
@@ -141,10 +109,21 @@ namespace SeverIDDictAPI
 
             builder.Services.AddHostedService<Worker>();
 
-            // Dùng Microsoft.AspNetCore.Identity.EntityFrameworkCore nên ko custom được cookie ".Application" ... phải dùng default
             builder.Services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/Home/Login"; // Chuyển hướng đến /Home/Login khi chưa đăng nhập
+                // Thay đổi tên cookie (mặc định: ".AspNetCore.Identity.Application")
+                options.Cookie.Name = ".MyApp.Auth";
+
+                // Những tuỳ chỉnh bạn đã có
+                options.LoginPath = "/Home/Login";
+                options.AccessDeniedPath = "/Home/Privacy";
+
+                // Một vài tuỳ chọn hay dùng
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // production: Always
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.SlidingExpiration = true;
             });
 
             var app = builder.Build();

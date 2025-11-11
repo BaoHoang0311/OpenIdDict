@@ -10,22 +10,22 @@ using OpenIddict.Server.AspNetCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using static OpenIddict.Abstractions.OpenIddictConstants;
+using SeverIDDictAPI.Data;
+using Microsoft.EntityFrameworkCore;
 namespace SeverIDDictAPI.Controllers
 {
     [ApiController]
     public class AuthorizeController : ControllerBase
     {
         private static ClaimsIdentity Identity = new ClaimsIdentity();
+        private readonly ApplicationDbContext _context;
         private readonly IOpenIddictScopeManager _scopeManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
         private readonly IOpenIddictTokenManager _tokenManager;
-        public AuthorizeController(IOpenIddictScopeManager scopeManager, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IOpenIddictTokenManager tokenManager)
+        public AuthorizeController(IOpenIddictScopeManager scopeManager, IOpenIddictTokenManager tokenManager, ApplicationDbContext context)
         {
             _scopeManager = scopeManager;
-            _signInManager = signInManager;
-            _userManager = userManager;
             _tokenManager = tokenManager;
+            _context = context;
         }
 
         [HttpPost]
@@ -55,86 +55,10 @@ namespace SeverIDDictAPI.Controllers
                     var signInResult = SignIn(new ClaimsPrincipal(Identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
                     return signInResult; // trả access token + refresh token
                 }
-                else if (openIdConnectRequest.IsPasswordGrantType())
-                {
+                //else if (openIdConnectRequest.IsPasswordGrantType())
+                //{
 
-                    user = await _userManager.FindByNameAsync(openIdConnectRequest.Username);
-
-                    if (user == null)
-                    {
-                        return BadRequest(new OpenIddictResponse
-                        {
-                            Error = Errors.InvalidGrant,
-                            ErrorDescription = "User does not exist"
-                        });
-                    }
-
-                    // Validate the username/password parameters and ensure the account is not locked out.  lockoutOnFailure: false (Count Failed)
-                    var result = await _signInManager.PasswordSignInAsync(user.UserName, openIdConnectRequest.Password, false, lockoutOnFailure: false);
-                    if (!result.Succeeded)
-                    {
-                        if (result.IsNotAllowed)
-                        {
-                            return BadRequest(new OpenIddictResponse
-                            {
-                                Error = Errors.InvalidGrant,
-                                ErrorDescription = "User not allowed to login. Please confirm your email"
-                            });
-                        }
-
-                        if (result.RequiresTwoFactor)
-                        {
-                            return BadRequest(new OpenIddictResponse
-                            {
-                                Error = Errors.InvalidGrant,
-                                ErrorDescription = "User requires 2F authentication"
-                            });
-                        }
-
-                        if (result.IsLockedOut)
-                        {
-                            return BadRequest(new OpenIddictResponse
-                            {
-                                Error = Errors.InvalidGrant,
-                                ErrorDescription = "User is locked out"
-                            });
-                        }
-                        else
-                        {
-                            return BadRequest(new OpenIddictResponse
-                            {
-                                Error = Errors.InvalidGrant,
-                                ErrorDescription = "Username or password is incorrect"
-                            });
-                        }
-                    }
-
-                    // The user is now validated, so reset lockout counts, if necessary
-                    if (_userManager.SupportsUserLockout)
-                    {
-                        await _userManager.ResetAccessFailedCountAsync(user);
-                    }
-
-                    var password = openIdConnectRequest.Password;
-                    var ddd = openIdConnectRequest.GetScopes(); // scope : offline_access
-                    //// Getting scopes from user parameters (TokenViewModel) and adding in Identity 
-                    Identity.SetScopes(openIdConnectRequest.GetScopes());
-
-                    //// You have to grant the 'offline_access' scope to allow
-                    //// OpenIddict to return a refresh token to the caller.
-                    if (!string.IsNullOrEmpty(openIdConnectRequest.Scope) && openIdConnectRequest.Scope.Split(' ').Contains(OpenIddictConstants.Scopes.OfflineAccess))
-                        Identity.SetScopes(OpenIddictConstants.Scopes.OfflineAccess);
-                    Identity.SetResources(new[] { "Resource", "Another_api" }); // claim aud
-
-                    Identity.AddClaim(new Claim(Claims.Subject, user.Id));
-                    Identity.AddClaim(new Claim("userid", user.Id));
-                    Identity.AddClaim(new Claim(Claims.Role, "Admin"));
-
-                    Identity.SetDestinations(GetDestinations);
-
-                    var signInResult = SignIn(new ClaimsPrincipal(Identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-                    return signInResult; // trả access token + refresh token
-                }
+                //}
                 else if (openIdConnectRequest.IsRefreshTokenGrantType())
                 {
                     // chỉ dùng refreshtoken 1 lần (sau khi dùng status "reddemed"
@@ -266,6 +190,8 @@ namespace SeverIDDictAPI.Controllers
         public async Task<IActionResult> Authorize()
         {
             var request = HttpContext.GetOpenIddictServerRequest();
+         
+            
             if (request == null)
                 throw new InvalidOperationException("Invalid OpenIddict request.");
 
@@ -276,8 +202,9 @@ namespace SeverIDDictAPI.Controllers
                     RedirectUri = Request.Path + Request.QueryString // truy cập vào trang Home/Login+RedirectUri=... ( RedirectUri = string ReturnUrl)
                 });
             }
+            var id =Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "id").Value);
             // Lấy thông tin user đăng nhập
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _context.Users.FirstOrDefaultAsync(x=>x.Id == id);
             if (user == null) return Forbid();
             var requestedScopes = request.Scope?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
             // Validate scopes

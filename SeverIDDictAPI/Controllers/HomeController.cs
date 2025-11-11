@@ -1,18 +1,23 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OpenIddict.Server.AspNetCore;
+using SeverIDDictAPI.Data;
 using SeverIDDictAPI.Model;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace SeverIDDictAPI.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        public HomeController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        private readonly ApplicationDbContext _context;
+        public HomeController(ApplicationDbContext context)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
+            _context = context;
         }
         public IActionResult Index()
         {
@@ -24,24 +29,27 @@ namespace SeverIDDictAPI.Controllers
         }
      
         [HttpGet]
-        public IActionResult Login(string ReturnUrl)
+        public async Task<IActionResult> Login(string ReturnUrl)
         {
+            var rerrsers = await _context.Users.ToListAsync();
             var model = new LoginModel() { ReturnUrl = ReturnUrl };
             return View("~/Views/Login/Login.cshtml",model );
         }
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            var result = await _signInManager.PasswordSignInAsync(model.UserNameOrEmail, model.Password, isPersistent: false, lockoutOnFailure: false);
-            if (result.Succeeded)
+            if(model.UserNameOrEmail == "bao" && model.Password == "1234")
             {
                 if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                 {
+                    var identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
+                    await HttpContext.SignInAsync(".MyApp.Auth", principal);
                     return Redirect(model.ReturnUrl);
                 }
                 return RedirectToAction("Index", "Home");
-            }
 
+            }
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return View("~/Views/Login/Login.cshtml", model);
         }
