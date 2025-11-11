@@ -42,7 +42,7 @@ namespace ResourceMVC.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> Privacy(string code)
+        public async Task<IActionResult> Privacy(string code,string state)
         {
             var httpClient = _httpClientFactory.CreateClient();
             var parameters = new Dictionary<string, string>
@@ -79,7 +79,12 @@ namespace ResourceMVC.Controllers
         public IActionResult LoginwithServer()
         {
             var scope = Uri.EscapeDataString("email offline_access profile api.write");
-            return Redirect($"https://localhost:7293/connect/authorize?client_id=test_client&response_type=code&scope={scope}");
+            return Redirect($"https://localhost:7293/connect/authorize?" +
+                $"client_id=test_client" +
+                $"&response_type=code" +
+                $"&state=af0ifjsldkj" +
+                $"&redirect_uri=https://localhost:7224/Home/Privacy" +
+                $"&scope={scope}");
         }
         public async Task<IActionResult> LogOut()
         {

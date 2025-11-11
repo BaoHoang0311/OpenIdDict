@@ -40,26 +40,7 @@ namespace SeverIDDictAPI.Controllers
                 Identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
                 IdentityUser? user = null;
-
-                if (openIdConnectRequest.IsClientCredentialsGrantType())
-                {
-                    var clientId = openIdConnectRequest.ClientId;
-                    var identity = new ClaimsIdentity(authenticationType: TokenValidationParameters.DefaultAuthenticationType);
-
-                    Identity.AddClaim(Claims.ClientId, clientId);
-                    identity.SetScopes(openIdConnectRequest.GetScopes());
-                    var principal = new ClaimsPrincipal(identity);
-                    if (!string.IsNullOrEmpty(openIdConnectRequest.Scope) && openIdConnectRequest.Scope.Split(' ').Contains(OpenIddictConstants.Scopes.OfflineAccess))
-                        Identity.SetScopes(OpenIddictConstants.Scopes.OfflineAccess);
-                    Identity.AddClaim(new Claim(Claims.Subject, "Sub_Client_Crendential"));
-                    var signInResult = SignIn(new ClaimsPrincipal(Identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-                    return signInResult; // trả access token + refresh token
-                }
-                //else if (openIdConnectRequest.IsPasswordGrantType())
-                //{
-
-                //}
-                else if (openIdConnectRequest.IsRefreshTokenGrantType())
+                if (openIdConnectRequest.IsRefreshTokenGrantType())
                 {
                     // chỉ dùng refreshtoken 1 lần (sau khi dùng status "reddemed"
                     // mà dùng lại lần nữa để lấy accesstoken thì hệ thống openiddict revoked toàn bộ những gì trong 
@@ -171,7 +152,7 @@ namespace SeverIDDictAPI.Controllers
                 });
             }
         }
-        
+
         /*
          * 1 MVC Controller ( LoginWithServer) trong đó có query param 
          * 2 vào thằng (connect/authorize)  
@@ -190,8 +171,8 @@ namespace SeverIDDictAPI.Controllers
         public async Task<IActionResult> Authorize()
         {
             var request = HttpContext.GetOpenIddictServerRequest();
-         
-            
+
+
             if (request == null)
                 throw new InvalidOperationException("Invalid OpenIddict request.");
 
@@ -202,9 +183,9 @@ namespace SeverIDDictAPI.Controllers
                     RedirectUri = Request.Path + Request.QueryString // truy cập vào trang Home/Login+RedirectUri=... ( RedirectUri = string ReturnUrl)
                 });
             }
-            var id =Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "id").Value);
+            var id = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "id").Value);
             // Lấy thông tin user đăng nhập
-            var user = await _context.Users.FirstOrDefaultAsync(x=>x.Id == id);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
             if (user == null) return Forbid();
             var requestedScopes = request.Scope?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
             // Validate scopes
@@ -263,7 +244,7 @@ namespace SeverIDDictAPI.Controllers
             var validationParams = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKeys = config.SigningKeys, 
+                IssuerSigningKeys = config.SigningKeys,
                 ValidateIssuer = false,
                 ValidateAudience = false,
                 ValidateLifetime = false
@@ -271,7 +252,7 @@ namespace SeverIDDictAPI.Controllers
 
             SecurityToken validatedToken;
 
-            // thu hồi toàn bộ accesstoken + refre  shtoken của authorizeID đó
+            // thu hồi toàn bộ accesstoken + refreshtoken của authorizeID đó
             var handler = new JwtSecurityTokenHandler();
             var principal = handler.ValidateToken(accessToken, validationParams, out validatedToken);
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
