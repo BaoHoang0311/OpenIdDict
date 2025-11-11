@@ -4,11 +4,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using SeverIDDictAPI.Data;
 using SeverIDDictAPI.Model;
+using SeverIDDictAPI.Modelssssssssssssssss;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace SeverIDDictAPI.Controllers
 {
@@ -38,13 +41,18 @@ namespace SeverIDDictAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            if(model.UserNameOrEmail == "bao" && model.Password == "1234")
+            var user = await _context.Users.FirstOrDefaultAsync(x=>x.UserName == model.UserNameOrEmail && x.Password == model.Password);
+            if(user != null)
             {
                 if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                 {
                     var identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
                     var principal = new ClaimsPrincipal(identity);
-                    await HttpContext.SignInAsync(".MyApp.Auth", principal);
+                    identity.AddClaim(Claims.Email, user.Email);
+                    identity.AddClaim(Claims.Subject, user.UserName);
+                    identity.AddClaim("id", user.Id);
+                    identity.AddClaim(Claims.Username, user.UserName);
+                    await HttpContext.SignInAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, principal);
                     return Redirect(model.ReturnUrl);
                 }
                 return RedirectToAction("Index", "Home");
