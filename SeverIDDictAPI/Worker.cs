@@ -21,7 +21,7 @@ namespace SeverIDDictAPI
                     ClientId = "test_client",
                     DisplayName = "Bao_API_APP",
                     ClientType = OpenIddictConstants.ClientTypes.Public, // ko cần gửi client_secret
-                    RedirectUris = { new Uri("https://localhost:7224/Home/Privacy") }, // URL callback của client
+                    RedirectUris = { new Uri("https://localhost:7240/callbackurl") }, // URL callback của client
                     Permissions =
                     {
                             // Để xác thực đăng nhập (authorization endpoint)

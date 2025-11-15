@@ -1,5 +1,5 @@
 ﻿{
-   "CodeGenerationMode": 4,
+   "CodeGenerationMode": 5,
    "ContextClassName": "db_OpenIDContext",
    "ContextNamespace": null,
    "FilterSchemas": false,
@@ -16,7 +16,7 @@
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[dbo].[User]",
+         "Name": "[dbo].[OpenIddictTokens]",
          "ObjectType": 0
       }
    ],

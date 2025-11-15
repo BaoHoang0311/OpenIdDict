@@ -84,47 +84,44 @@ namespace SeverIDDictAPI
             {
                 options.SetIssuer(new Uri("https://localhost:7293/"));
                 options.SetTokenEndpointUris("connect/token");
-                options.SetAuthorizationEndpointUris("/connect/authorize");
+                options.SetAuthorizationEndpointUris("connect/authorize");
                 options.SetIntrospectionEndpointUris("token/introspect");
+                options.SetRevocationEndpointUris("token/revoke");
 
-                options.AllowClientCredentialsFlow().AllowRefreshTokenFlow();
-                options.AllowPasswordFlow().AllowRefreshTokenFlow();
-                options.AllowAuthorizationCodeFlow();
+                options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
 
-                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(60));
-
-                // Encryption and signing of tokens
+                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(60))
+                       .SetRefreshTokenLifetime(TimeSpan.FromDays(7));
                 options
                     .AddSigningKey(rsaKeyService1.SigningKey)
                     .AddEncryptionKey(rsaKeyService1.EncryptionKey) // 👈 Giải quyết lỗi
                     .DisableAccessTokenEncryption(); // 👈 tắt mã hóa access token (nếu muốn)
-                                                     // ✅ Add real certificates
 
-
-                // tắt mã hóa access token nếu bạn dùng JWT
+                // trong thời gian này được cấp token ko giới hạn
+                options.SetRefreshTokenReuseLeeway(TimeSpan.FromMilliseconds(2000));
+                    //// tắt mã hóa access token nếu bạn dùng JWT
                 options.UseAspNetCore()
                 .EnableTokenEndpointPassthrough()
                 .EnableAuthorizationEndpointPassthrough();
             });
 
             builder.Services.AddHostedService<Worker>();
-
-            builder.Services.ConfigureApplicationCookie(options =>
-            {
-                // Thay đổi tên cookie (mặc định: ".AspNetCore.Identity.Application")
-                options.Cookie.Name = ".MyApp.Auth";
-
-                // Những tuỳ chỉnh bạn đã có
-                options.LoginPath = "/Home/Login";
-                options.AccessDeniedPath = "/Home/Privacy";
-
-                // Một vài tuỳ chọn hay dùng
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // production: Always
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-                options.SlidingExpiration = true;
-            });
+            builder.Services
+                    .AddAuthentication(
+                        options =>
+                        {
+                            options.DefaultScheme = "MyApp.Auth";
+                            options.DefaultChallengeScheme = "MyApp.Auth";
+                        }
+                    )
+                    .AddCookie("MyApp.Auth", options =>
+                    {
+                        options.Cookie.HttpOnly = true;
+                        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+                        options.LoginPath = "/Home/Login";
+                        options.AccessDeniedPath = "/Home/Privacy";
+                        options.SlidingExpiration = true;
+                    });
 
             var app = builder.Build();
 

@@ -1,16 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
-using OpenIddict.Server.AspNetCore;
 using SeverIDDictAPI.Data;
 using SeverIDDictAPI.Model;
-using SeverIDDictAPI.Modelssssssssssssssss;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace SeverIDDictAPI.Controllers
@@ -46,13 +40,13 @@ namespace SeverIDDictAPI.Controllers
             {
                 if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                 {
-                    var identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                    var identity = new ClaimsIdentity("MyApp.Auth");
                     var principal = new ClaimsPrincipal(identity);
                     identity.AddClaim(Claims.Email, user.Email);
                     identity.AddClaim(Claims.Subject, user.UserName);
                     identity.AddClaim("id", user.Id);
                     identity.AddClaim(Claims.Username, user.UserName);
-                    await HttpContext.SignInAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, principal);
+                    await HttpContext.SignInAsync("MyApp.Auth", principal);
                     return Redirect(model.ReturnUrl);
                 }
                 return RedirectToAction("Index", "Home");

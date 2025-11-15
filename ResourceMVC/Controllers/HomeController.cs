@@ -50,6 +50,7 @@ namespace ResourceMVC.Controllers
                 { "grant_type", "authorization_code" },                                                                                                                                                                                                           
                 { "client_id", "test_client" },
                 { "code", code }, // Replace with actual code
+                {"redirect_uri","https://localhost:7224/Home/Privacy" }
             };
             var content = new FormUrlEncodedContent(parameters);
             var response = await httpClient.PostAsync("https://localhost:7293/connect/token", content);
@@ -61,6 +62,8 @@ namespace ResourceMVC.Controllers
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token.access_token);
             var identity = new ClaimsIdentity("Application");
+
+
             identity.AddClaim(new Claim("Email", jwt.Claims.FirstOrDefault(u => u.Type == "email").Value)); // jwt.Payload["Name"]
             identity.AddClaim(new Claim("Name", jwt.Claims.FirstOrDefault(u => u.Type == "userid").Value)); // jwt.Payload["Name"]
             foreach (var role in jwt.Claims.Where(u => u.Type == "role"))

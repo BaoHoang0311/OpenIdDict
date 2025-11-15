@@ -12,8 +12,8 @@
             builder.Services.AddSession();
             builder.Services.AddAuthentication(o =>
             {
-                o.DefaultAuthenticateScheme = "Application";
                 o.DefaultScheme = "Application";
+                o.DefaultChallengeScheme = "Application";
             })
             .AddCookie("Application", options =>
             {
