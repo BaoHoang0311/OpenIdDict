@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeverIDDictAPI", "SeverIDDi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceAPI", "ResourceAPI\ResourceAPI.csproj", "{E37BDE85-B548-4EC7-80B1-7A8981D90524}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceMVC", "ResourceMVC\ResourceMVC.csproj", "{78C1A606-039A-48CF-A544-2CD46355E50C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,18 +41,6 @@ Global
 		{E37BDE85-B548-4EC7-80B1-7A8981D90524}.Release|x64.Build.0 = Release|Any CPU
 		{E37BDE85-B548-4EC7-80B1-7A8981D90524}.Release|x86.ActiveCfg = Release|Any CPU
 		{E37BDE85-B548-4EC7-80B1-7A8981D90524}.Release|x86.Build.0 = Release|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Debug|x64.Build.0 = Debug|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Debug|x86.Build.0 = Debug|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Release|x64.ActiveCfg = Release|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Release|x64.Build.0 = Release|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Release|x86.ActiveCfg = Release|Any CPU
-		{78C1A606-039A-48CF-A544-2CD46355E50C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

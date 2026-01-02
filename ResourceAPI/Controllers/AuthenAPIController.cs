@@ -51,15 +51,15 @@ namespace ResourceAPI.Controllers
                 { "grant_type", "authorization_code" },
                 { "client_id", "test_client" },
                 { "code", code }, // Replace with actual code
-                {"redirect_uri","https://localhost:7240/callbackurl" }
+                { "redirect_uri","https://localhost:7240/callbackurl" }
             };
             var httpClient = _httpClientFactory.CreateClient();
             var content = new FormUrlEncodedContent(parameters);
             var response = await httpClient.PostAsync("https://localhost:7293/connect/token", content);
             // Read and output the response
             var responseContent = await response.Content.ReadAsStringAsync();
-
-            var path=  Environment.CurrentDirectory+"Token.json";
+            //F:\OpenIdDict\ResourceAPI\ResourceAPI.csproj
+            var path=  Environment.CurrentDirectory+ "\\wwwroot\\Token.json";
 
             System.IO.File.WriteAllText(path,responseContent);
             return Ok();

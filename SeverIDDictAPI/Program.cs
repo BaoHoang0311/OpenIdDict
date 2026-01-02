@@ -97,7 +97,7 @@ namespace SeverIDDictAPI
                     .AddEncryptionKey(rsaKeyService1.EncryptionKey) // 👈 Giải quyết lỗi
                     .DisableAccessTokenEncryption(); // 👈 tắt mã hóa access token (nếu muốn)
 
-                // trong thời gian này được cấp token ko giới hạn
+                // trong thời gian này được cấp token ko giới hạn, dùng lại là xóa luôn toàn bộ token
                 options.SetRefreshTokenReuseLeeway(TimeSpan.FromMilliseconds(2000));
                     //// tắt mã hóa access token nếu bạn dùng JWT
                 options.UseAspNetCore()

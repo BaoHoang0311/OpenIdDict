@@ -59,7 +59,6 @@ namespace SeverIDDictAPI.Controllers
                     // Chỉ revoke khi phát hiện refresh token bị reuse (OpenIddict tự xử lý)
                     // Sau khi dùng Refreshtoken A xin cấp lại access/refresh mới
                     // dùng lại Refreshtoken A để instropect/ hay xin cấp lại refreshtoken là thằng tbo.OpenIdtoken nó revoked hết
-                    //await _tokenManager.RevokeByAuthorizationIdAsync(oi_au_id);
 
                     // gt:refresh_token
                     return SignIn(result.Principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -160,20 +159,9 @@ namespace SeverIDDictAPI.Controllers
                 });
             }
         }
-
         /*
-         * 1 APICore (ClientResourceAPI) ( Login) trong đó có query param 
-         * 2 vào thằng (connect/authorize)  
-         * 3 lấy được thông tin các param từ trang APICore (ClientResource) chuyển qua
-         * 3.1 nếu chưa đăng nhập thì 
-         *              1) redirect Home/Login của serverOpenID đăng nhập -> đăng nhập Home/Login (serverOpenID) 
-         *              2) đăng nhập xong redirect ("connect/authorize")
-         *              3) lúc này đã đăng nhập rồi xong set scope của thằng openiddict
-         *              4)  return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-         *              5) Redirect vào returnURL đã setting trong Worker.cs (RedirectUris = { new Uri("https://localhost:7240/callbackurl") }, //(ClientResourceAPI)
-         *             -> APICore truy cập (conntect/token) lấy access/refresh token
-         * 3.2 nếu đăng nhập rồi thì lấy thông tin param đem vào "OpenIddict.Server.AspNetCore"
-         *              ->Redirect vào returnURL đã setting trong Worker.cs (RedirectUris = { new Uri("https://localhost:7240/callbackurl") }, //(ClientResourceAPI)
+         * Dung nhu login google , tra link ve roi dang nhap
+         * 
          */
         [HttpGet("connect/authorize")]
         public async Task<IActionResult> Authorize()
@@ -240,44 +228,5 @@ namespace SeverIDDictAPI.Controllers
         }
 
         #endregion
-        /// <summary>
-        ///     Logout dùng accesstoken 
-        ///     nhưng production ko dùng accesstoken để logout , dùng refreshtoken (nên setting revoke rồi , cứ logout đem thằng refresh revoke)
-        /// </summary>
-        /// <param name="accessToken"></param>
-        /// <returns></returns>
-        [Route("token/logout")]
-        [HttpPost]
-        public async Task<IActionResult> Logout([FromForm] string accessToken)
-        {
-            var configManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-                "https://localhost:7293/.well-known/openid-configuration",
-                new OpenIdConnectConfigurationRetriever());
-
-            var config = await configManager.GetConfigurationAsync();
-            var validationParams = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKeys = config.SigningKeys,
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,  // Phải bật lên
-                ClockSkew = TimeSpan.Zero // Loại bỏ khoảng trễ mặc định
-            };
-
-            SecurityToken validatedToken;
-
-            // thu hồi toàn bộ accesstoken + refreshtoken của authorizeID đó
-            var handler = new JwtSecurityTokenHandler();
-            var principal = handler.ValidateToken(accessToken, validationParams, out validatedToken);
-            // Đăng xuất khỏi cookie/identity (nếu có)
-            await HttpContext.SignOutAsync("MyApp.Auth");
-
-            var oi_au_id = principal.Claims.FirstOrDefault(c => c.Type == "oi_au_id")?.Value;
-            if (string.IsNullOrEmpty(oi_au_id))
-                return BadRequest("oi_au_id");
-            await _tokenManager.RevokeByAuthorizationIdAsync(oi_au_id);
-            return Ok();
-        }
     }
 }
