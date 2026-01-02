@@ -1,6 +1,7 @@
 ﻿using OpenIddict.Abstractions;
 using System.Resources;
-// worker _1
+// worker _2
+// worker _3
 namespace SeverIDDictAPI
 {
     public class Worker : IHostedService
