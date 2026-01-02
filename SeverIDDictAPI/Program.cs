@@ -4,7 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SeverIDDictAPI.Data;
 using System.Security.Cryptography;
-
+/*
+ * lệnh git rebase sau khi xử lý conflict:
+ *          git rebase --continue -> gõ : ":wq" -> xong rồi như bình thường
+ * 
+ */
 namespace SeverIDDictAPI
 {
     //worker _2
