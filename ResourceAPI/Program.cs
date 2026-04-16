@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -57,6 +58,12 @@ namespace ResourceAPI
             builder.Services.AddOpenApi();
             builder.Services.AddMemoryCache();
 
+            builder.Services.AddDbContext<ApplicationDbContext>(option =>
+            {
+                option.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnectionStr"));
+            });
+
+
             builder.Services.AddSwaggerGen(options =>
             {
                 #region jwt authentication
@@ -100,7 +107,13 @@ namespace ResourceAPI
             })
             .AddJwtBearer(options =>
             {
-                options.Authority = "https://localhost:7293/"; // nó tự lấy key /.wellknow/jwks ko cần custom như bên dưới                          
+                ///
+                /// trong thực tế ko cần check gì cả logout thì đem thằng refresh token thu hồi là xong chấp nhận thằng accesstoken có quyền truy cập trong
+                /// khoảng thời gian ngắn
+                ///
+
+                options.Authority = "https://localhost:7293/"; // nó tự lấy key /.wellknow/jwks ko cần custom như bên dưới
+                // set resourse
                 options.Audience = "Resource";
                 // name of the API resource
                 options.RequireHttpsMetadata = false;
@@ -110,37 +123,7 @@ namespace ResourceAPI
                     ValidateLifetime = true,  // Phải bật lên
                     ClockSkew = TimeSpan.Zero // Loại bỏ khoảng trễ mặc định
                 };
-                ///
-                /// trong thực tế ko cần check gì cả logout thì đem thằng refresh token thu hồi là xong chấp nhận thằng accesstoken có quyền truy cập trong
-                /// khoảng thời gian ngắn
-                ///
-                //options.Events = new JwtBearerEvents
-                //{
-                //    OnTokenValidated = async context =>
-                //    {
-                //        var tokenService = context.HttpContext.RequestServices
-                //                        .GetRequiredService<TokenIntrospectionService>();
-                //        var tokenString = "";
-                //        // Hoặc lấy từ Authorization header
-                //        var authHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-                //        if (authHeader != null && authHeader.StartsWith("Bearer "))
-                //        {
-                //            tokenString = authHeader.Substring("Bearer ".Length).Trim();
-                //        }
-                //        var isActive = await tokenService.IsTokenActiveAsync(tokenString);
-                //        if (!isActive)
-                //        {
-                //            context.Fail("Token has been revoked");
-                //        }
-                //        var roleClaim = context.Principal.FindFirst(ClaimTypes.Role);
-                //        if (roleClaim == null)
-                //        {
-                //            // Không có claim "role", từ chối xác thực
-                //            context.Fail("Missing required 'role' claim.");
-                //        }
-                //        //return Task.CompletedTask;
-                //    }
-                //};
+
             });
             // Register the handler so the DI system will call it
             builder.Services.AddSingleton<IAuthorizationHandler, GenZRequirementHandler>();
@@ -159,7 +142,7 @@ namespace ResourceAPI
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.MapOpenApi(); 
             }
             app.UseSwagger();
             app.UseSwaggerUI();

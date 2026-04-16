@@ -1,17 +1,11 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
-using OpenIddict.EntityFrameworkCore.Models;
 using OpenIddict.Server.AspNetCore;
 using SeverIDDictAPI.Data;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 namespace SeverIDDictAPI.Controllers
@@ -22,14 +16,10 @@ namespace SeverIDDictAPI.Controllers
         private static ClaimsIdentity Identity = new ClaimsIdentity();
         private readonly ApplicationDbContext _context;
         private readonly IOpenIddictScopeManager _scopeManager;
-        private readonly IOpenIddictTokenManager _tokenManager;
-        private readonly IOpenIddictAuthorizationManager _authorizationManager;
         public AuthorizeController(IOpenIddictScopeManager scopeManager, IOpenIddictTokenManager tokenManager, ApplicationDbContext context, IOpenIddictAuthorizationManager authorizationManager)
         {
             _scopeManager = scopeManager;
-            _tokenManager = tokenManager;
             _context = context;
-            _authorizationManager = authorizationManager;
         }
 
         [HttpPost]
@@ -161,13 +151,12 @@ namespace SeverIDDictAPI.Controllers
         }
         /*
          * Dung nhu login google , tra link ve roi dang nhap
-         * 
          */
         [HttpGet("connect/authorize")]
         public async Task<IActionResult> Authorize()
         {
+            // lấy thông tin state from Client trong này cũng được nè
             var request = HttpContext.GetOpenIddictServerRequest();
-
 
             if (request == null)
                 throw new InvalidOperationException("Invalid OpenIddict request.");
@@ -179,6 +168,7 @@ namespace SeverIDDictAPI.Controllers
                     RedirectUri = Request.Path + Request.QueryString // truy cập vào trang Home/Login+RedirectUri=... ( RedirectUri = string ReturnUrl)
                 });
             }
+
             var id = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "id").Value);
             // Lấy thông tin user đăng nhập
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
@@ -196,6 +186,7 @@ namespace SeverIDDictAPI.Controllers
             }
             var identity = new ClaimsIdentity(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             identity.AddClaim(OpenIddictConstants.Claims.Subject, user.Email);
+
             if (validScopes.Contains("profile"))
             {
                 identity.AddClaim("name", "John Doe");
@@ -207,6 +198,7 @@ namespace SeverIDDictAPI.Controllers
                 identity.AddClaim(Claims.Email, user.Email);
                 identity.AddClaim("userid", user.Id);
             }
+
             var principal = new ClaimsPrincipal(identity);
             principal.SetScopes(validScopes);
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -219,7 +211,6 @@ namespace SeverIDDictAPI.Controllers
             // Note: by default, claims are NOT automatically included in the access and identity tokens.
             // To allow OpenIddict to serialize them, you must attach them a destination, that specifies
             // whether they should be included in access tokens, in identity tokens or in both.
-
             return claim.Type switch
             {
                 Claims.Role or "userid" or Claims.Email or Claims.Audience or Claims.Birthdate => new[] { Destinations.AccessToken }, // Chỉ thêm sub vào identity token

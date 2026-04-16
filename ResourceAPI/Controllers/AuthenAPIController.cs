@@ -62,7 +62,7 @@ namespace ResourceAPI.Controllers
             var path=  Environment.CurrentDirectory+ "\\wwwroot\\Token.json";
 
             System.IO.File.WriteAllText(path,responseContent);
-            return Ok();
+            return Ok(responseContent);
         }
     }
 }

@@ -11,7 +11,6 @@ using System.Security.Cryptography;
  */
 namespace SeverIDDictAPI
 {
-    //worker _2
     public class RsaKeyService1
     {
         public RsaSecurityKey SigningKey { get; }
@@ -20,18 +19,17 @@ namespace SeverIDDictAPI
         public RsaKeyService1()
         {
             // 1️⃣ Load hoặc tạo Signing key (persisted to file)
-            var signingKeyPath = Path.Combine(AppContext.BaseDirectory, "signing-key.xml");
+            var signingKeyPath = Path.Combine(AppContext.BaseDirectory.Replace("\\bin\\Debug\\net9.0",""), "signing-key.xml");
             SigningKey = LoadOrCreateRsaKey(signingKeyPath, "signing-key-2025");
 
             // 2️⃣ Load hoặc tạo Encryption key (persisted to file)
-            var encryptionKeyPath = Path.Combine(AppContext.BaseDirectory, "encryption-key.xml");
+            var encryptionKeyPath = Path.Combine(AppContext.BaseDirectory.Replace("\\bin\\Debug\\net9.0", ""), "encryption-key.xml");
             EncryptionKey = LoadOrCreateRsaKey(encryptionKeyPath, "encryption-key-2025");
         }
 
         private static RsaSecurityKey LoadOrCreateRsaKey(string filePath, string keyId)
         {
             RSA rsa = RSA.Create(2048);
-
             if (File.Exists(filePath))
             {
                 var xml = File.ReadAllText(filePath);
@@ -42,12 +40,10 @@ namespace SeverIDDictAPI
                 var xml = rsa.ToXmlString(includePrivateParameters: true);
                 File.WriteAllText(filePath, xml);
             }
-
             var key = new RsaSecurityKey(rsa)
             {
                 KeyId = keyId  // 🔥 Gán KeyId rõ ràng, cố định ,sẽ ko bị đổi khi app restart
             };
-
             return key;
         }
     }
@@ -95,16 +91,19 @@ namespace SeverIDDictAPI
 
                 options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
 
-                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(60))
+                options.SetAccessTokenLifetime(TimeSpan.FromMilliseconds(20))
                        .SetRefreshTokenLifetime(TimeSpan.FromDays(7));
-                options
-                    .AddSigningKey(rsaKeyService1.SigningKey)
-                    .AddEncryptionKey(rsaKeyService1.EncryptionKey) // 👈 Giải quyết lỗi
-                    .DisableAccessTokenEncryption(); // 👈 tắt mã hóa access token (nếu muốn)
+
+
+                options.AddSigningKey(rsaKeyService1.SigningKey)
+                       .AddEncryptionKey(rsaKeyService1.EncryptionKey)
+                       .DisableAccessTokenEncryption();
 
                 // trong thời gian này được cấp token ko giới hạn, dùng lại là xóa luôn toàn bộ token
                 options.SetRefreshTokenReuseLeeway(TimeSpan.FromMilliseconds(2000));
-                    //// tắt mã hóa access token nếu bạn dùng JWT
+
+                //// tắt mã hóa access token nếu bạn dùng JWT
+                ///
                 options.UseAspNetCore()
                 .EnableTokenEndpointPassthrough()
                 .EnableAuthorizationEndpointPassthrough();
@@ -122,7 +121,8 @@ namespace SeverIDDictAPI
                     .AddCookie("MyApp.Auth", options =>
                     {
                         options.Cookie.HttpOnly = true;
-                        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+                        options.ExpireTimeSpan = TimeSpan.FromSeconds(5);
+                        options.SlidingExpiration = false;
                         options.LoginPath = "/Home/Login";
                         options.AccessDeniedPath = "/Home/Privacy";
                         options.SlidingExpiration = true;
