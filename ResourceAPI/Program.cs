@@ -112,7 +112,7 @@ namespace ResourceAPI
                 /// khoảng thời gian ngắn
                 ///
 
-                options.Authority = "https://localhost:7293/"; // nó tự lấy key /.wellknow/jwks ko cần custom như bên dưới
+                options.Authority = "https://localhost:7293/"; // nó tự lấy key /.well-know/jwks ko cần custom như bên dưới
                 // set resourse
                 options.Audience = "Resource";
                 // name of the API resource

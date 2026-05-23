@@ -19,6 +19,7 @@ namespace ResourceAPI.Controllers
         [HttpGet("/login")]
         public async Task<IActionResult> LoginWithServer()
         {
+            //offline_access : cấp refresh token , ko có ko cấp
             var scope = Uri.EscapeDataString("email offline_access profile api.write");
             var url = $"https://localhost:7293/connect/authorize?" +
                 $"client_id=test_client" +
@@ -35,7 +36,7 @@ namespace ResourceAPI.Controllers
             var parameters = new Dictionary<string, string>
             {
                 { "client_id", "test_client" },
-                { "token", refreshToken }, // Replace with actual code
+                { "token", refreshToken },
             };
             var httpClient = _httpClientFactory.CreateClient();
             var content = new FormUrlEncodedContent(parameters);

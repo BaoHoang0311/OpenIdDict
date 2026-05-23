@@ -156,6 +156,7 @@ namespace SeverIDDictAPI.Controllers
         public async Task<IActionResult> Authorize()
         {
             // lấy thông tin state from Client trong này cũng được nè
+            
             var request = HttpContext.GetOpenIddictServerRequest();
 
             if (request == null)
@@ -174,7 +175,6 @@ namespace SeverIDDictAPI.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
             if (user == null) return Forbid();
             var requestedScopes = request.Scope?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
-            // Validate scopes
             var validScopes = new List<string>();
             foreach (var scope in requestedScopes)
             {

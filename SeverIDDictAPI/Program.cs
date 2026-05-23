@@ -42,7 +42,7 @@ namespace SeverIDDictAPI
             }
             var key = new RsaSecurityKey(rsa)
             {
-                KeyId = keyId  // 🔥 Gán KeyId rõ ràng, cố định ,sẽ ko bị đổi khi app restart
+                KeyId = keyId  // 🔥 Gán KeyId rõ ràng, cố định ,sẽ ko bị đổi khi app restart (Key ko có đổi) (ko cần cũng dc)
             };
             return key;
         }
@@ -83,6 +83,7 @@ namespace SeverIDDictAPI
                            })
             .AddServer(options =>
             {
+                //https://localhost:7293/.well-known/jwks
                 options.SetIssuer(new Uri("https://localhost:7293/"));
                 options.SetTokenEndpointUris("connect/token");
                 options.SetAuthorizationEndpointUris("connect/authorize");
@@ -91,7 +92,7 @@ namespace SeverIDDictAPI
 
                 options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
 
-                options.SetAccessTokenLifetime(TimeSpan.FromMilliseconds(20))
+                options.SetAccessTokenLifetime(TimeSpan.FromMinutes(20))
                        .SetRefreshTokenLifetime(TimeSpan.FromDays(7));
 
 

@@ -162,7 +162,7 @@ namespace ResourceAPI.Controllers
         }
 
         [Authorize]
-        [HttpPost]
+        [HttpGet("GetUsers")]
         [RequiredScope("api.write")]
         public IActionResult GetUsers()
         {
