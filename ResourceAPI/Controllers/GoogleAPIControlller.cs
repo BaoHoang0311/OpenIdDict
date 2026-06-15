@@ -1,9 +1,4 @@
-﻿using Azure.Core;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Drive.v3;
-using Google.Apis.Services;
-using Google.Apis.Util.Store;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace ResourceAPI.Controllers
 {
@@ -11,8 +6,6 @@ namespace ResourceAPI.Controllers
     [ApiController]
     public class GoogleAPIControlller : ControllerBase
     {
-        private static readonly string[] Scopes = new[] { DriveService.Scope.DriveFile, DriveService.Scope.Drive };
-
         public GoogleAPIControlller()
         {
 
@@ -21,6 +14,14 @@ namespace ResourceAPI.Controllers
         public async Task<IActionResult> DriveUploadBasic()
         {
             var res = Testt();
+            // Follow
+            // 1.Gọi API Postman google,
+            // 2.Xong returnURl lấy code (dùng code lấy thông accesstoken+refreshtoken)
+            // 3.Dùng accesstoken lấy thông tin của User
+            // 4.Tra thông tin User, (ví dụ lấy name + gmail) để tra (trong project Sav user lúc register dùng email + name này để login)
+
+            // Note: Đăng nhập = google lưu database (UserName + Email) giống nhau
+
             return Ok("Google API is working");
         }
         private string Testt()
